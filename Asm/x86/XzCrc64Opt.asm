@@ -23,8 +23,8 @@ MY_ASM_START
     %if n == 0
         %fatal <CRC_1_src_param_IS_INCORRECT>
     %else
-        ; x<n>  ==>  r<n>
-        %1      %2, [rT + %tok(%strcat('r', %eval(n-1))) * 8 + 0800h * (%4) + (%5) * 4]
+        ; x<n>  ==>  x<n>_R
+        %1      %2, [rT + %tok(%strcat('x', %eval(n-1), "_R")) * 8 + 0800h * (%4) + (%5) * 4]
     %endif
 %endmacro
 
@@ -337,9 +337,9 @@ MY_PROC AddNum(XzCrc64UpdateT, NUM_WORDS * 4), 5
         jb      .crc_end
 @@:
         test    rD, ALIGN_MASK
-        jz      @B
+        jz      @F
         CRC1b
-        jmp     @F
+        jmp     @B
 @@:
         xor     x0, [rD]
         lea     rN, [rD + rN * 1 - (NUM_BYTES_LIMIT_T4 - 1)]
