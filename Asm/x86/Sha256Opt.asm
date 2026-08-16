@@ -80,13 +80,14 @@ MY_ASM_START
 %endmacro
 
 
-%define msg         xmm0
-%define tmp         xmm0
+%define msg_N       0
+%define tmp_N       0
 %define state0_N    2
 %define state1_N    3
 %define w_regs      4
 
-
+%define msg         XMM_REG(msg_N)
+%define tmp         XMM_REG(tmp_N)
 %define state1_save xmm1
 %define state0      XMM_REG(state0_N)
 %define state1      XMM_REG(state1_N)
@@ -117,23 +118,23 @@ MY_ASM_START
 
 %macro RND4 1
         movdqa  msg, [rTable + (%1) * 16]
-        paddd   msg, XMM_REG(w_regs + ((%1 + 0) mod 4))
+        XMMOP   paddd, msg_N, (w_regs + ((%1 + 0) mod 4))
         sha256rnds2 state0, state1
-        pshufd   msg, msg, 0eH
-        
+        pshufd  msg, msg, 0eH
+
     %if (%1 >= (4 - pre1)) && (%1 < (16 - pre1))
         ; w4[0] = msg1(w4[-4], w4[-3])
-        sha256msg1  XMM_REG(w_regs + ((%1 + pre1) mod 4)), XMM_REG(w_regs + ((%1 + pre1 - 3) mod 4))
+        XMMOP  sha256msg1, (w_regs + ((%1 + pre1) mod 4)), (w_regs + ((%1 + pre1 - 3) mod 4))
     %endif
 
         sha256rnds2 state1, state0
 
     %if (%1 >= (4 - pre2)) && (%1 < (16 - pre2))
-        movdqa  tmp, XMM_REG(w_regs + ((%1 + pre2 - 1) mod 4))
-        palignr tmp, XMM_REG(w_regs + ((%1 + pre2 - 2) mod 4)), 4
-        paddd   XMM_REG(w_regs + ((%1 + pre2) mod 4)), tmp
+        XMMOP  movdqa,  tmp_N, (w_regs + ((%1 + pre2 - 1) mod 4))
+        XMMOP  palignr, tmp_N, (w_regs + ((%1 + pre2 - 2) mod 4)), 4
+        XMMOP  paddd,   (w_regs + ((%1 + pre2) mod 4)), tmp_N
         ; w4[0] = msg2(w4[0], w4[-1])
-        sha256msg2  XMM_REG(w_regs + ((%1 + pre2) mod 4)), XMM_REG(w_regs + ((%1 + pre2 - 1) mod 4))
+        XMMOP  sha256msg2, (w_regs + ((%1 + pre2) mod 4)), (w_regs + ((%1 + pre2 - 1) mod 4))
     %endif
 %endmacro
 

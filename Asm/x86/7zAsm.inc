@@ -351,6 +351,15 @@
 %define YMM_REG(n)    AddNum(ymm, n)
 
 
+%macro XMMOP 3-4 ; op, reg1, reg2
+    %if %0 == 4
+        %1 XMM_REG(%2), XMM_REG(%3), %4
+    %else
+        %1 XMM_REG(%2), XMM_REG(%3)
+    %endif
+%endmacro
+
+
 %assign labelnum   0
 %define anonlabel  "..@mylabel_"
 

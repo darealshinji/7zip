@@ -98,13 +98,9 @@ MY_ASM_START
 %define NUM_ROUNDS4 20
 
 
-%macro MY_XMMCMD 3 ; op, reg1, reg2
-        %1 XMM_REG(%2), XMM_REG(%3)
-%endmacro
-
 %macro RND4 1
-        MY_XMMCMD  movdqa, (e0_N + ((%1 + 1) mod 2)), abcd_N
-        sha1rnds4 abcd, %tok(%strcat(e, %eval(e0_N + (%1 mod 2)))), %1 / 5
+        XMMOP  movdqa, (e0_N + ((%1 + 1) mod 2)), abcd_N
+        XMMOP  sha1rnds4, abcd_N, (e0_N + (%1 mod 2)), %1 / 5
 
         %assign nextM w_regs + ((%1 + 1) mod 4)
 
@@ -112,18 +108,18 @@ MY_ASM_START
         %assign nextM e0_save_N
     %endif
 
-        MY_XMMCMD  sha1nexte, (e0_N + ((%1 + 1) mod 2)), nextM
+        XMMOP  sha1nexte, (e0_N + ((%1 + 1) mod 2)), nextM
 
     %if (%1 >= (4 - pre2)) && (%1 < (NUM_ROUNDS4 - pre2))
-        MY_XMMCMD  pxor, (w_regs + ((%1 + pre2) mod 4)), (w_regs + ((%1 + pre2 - 2) mod 4))
+        XMMOP  pxor, (w_regs + ((%1 + pre2) mod 4)), (w_regs + ((%1 + pre2 - 2) mod 4))
     %endif
 
     %if (%1 >= (4 - pre1)) && (%1 < (NUM_ROUNDS4 - pre1))
-        MY_XMMCMD  sha1msg1, (w_regs + ((%1 + pre1) mod 4)), (w_regs + ((%1 + pre1 - 3) mod 4))
+        XMMOP  sha1msg1, (w_regs + ((%1 + pre1) mod 4)), (w_regs + ((%1 + pre1 - 3) mod 4))
     %endif
 
     %if (%1 >= (4 - pre2)) && (%1 < (NUM_ROUNDS4 - pre2))
-        MY_XMMCMD  sha1msg2, (w_regs + ((%1 + pre2) mod 4)), (w_regs + ((%1 + pre2 - 1) mod 4))
+        XMMOP  sha1msg2, (w_regs + ((%1 + pre2) mod 4)), (w_regs + ((%1 + pre2 - 1) mod 4))
     %endif
 %endmacro
 
