@@ -145,8 +145,8 @@ MY_ASM_START
 %macro REVERSE_STATE 0
                                ; state0 ; dcba
                                ; state1 ; hgfe
-        pshufd      tmp, state0, 1BH    ; abcd
-        pshufd   state0, state1, 1BH    ; efgh
+        pshufd      tmp, state0, 01bH   ; abcd
+        pshufd   state0, state1, 01bH   ; efgh
         movdqa   state1, state0         ; efgh
         punpcklqdq  state0, tmp         ; cdgh
         punpckhqdq  state1, tmp         ; abef

@@ -433,15 +433,13 @@ ALIGN 16
         %1     %4, DWORD [rD + (%2 + 1) * STEP_SIZE + 4 - src_rD_offset]
 %endmacro
 
-%macro ITER_12 5
-    %assign index %1
-
+%macro ITER_12 5 ; index, a0, a1, v0, v1
   %if NUM_SKIP_BYTES == 0
-        ITER_12_NEXT mov, index, %4, %5
+        ITER_12_NEXT mov, %1, %4, %5
   %else
     %assign k 0
     %rep NUM_SKIP_BYTES
-        movzx   xA, BYTE [rD + (index) * STEP_SIZE + k + 8 - src_rD_offset]
+        movzx   xA, BYTE [rD + %1 * STEP_SIZE + k + 8 - src_rD_offset]
       %if k == 0
         CRC mov, mov,   %4, %5, xA, NUM_SKIP_BYTES - 1 - k
       %else
@@ -449,7 +447,7 @@ ALIGN 16
       %endif
       %assign k k+1
     %endrep
-        ITER_12_NEXT xor, index, %4, %5
+        ITER_12_NEXT xor, %1, %4, %5
   %endif
 
   %if 0 == 0

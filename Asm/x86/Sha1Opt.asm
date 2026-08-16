@@ -31,11 +31,11 @@ MY_ASM_START
       %endif
     %else ; x86
       %if IS_CDECL == 1
-        mov     rState, dword [r4 + REG_SIZE * 1]
-        mov     rData,  dword [r4 + REG_SIZE * 2]
-        mov     rNum,   dword [r4 + REG_SIZE * 3]
+        mov     rState, [r4 + REG_SIZE * 1]
+        mov     rData,  [r4 + REG_SIZE * 2]
+        mov     rNum,   [r4 + REG_SIZE * 3]
       %else ; fastcall
-        mov     rNum,   dword [r4 + REG_SIZE * 1]
+        mov     rNum,   [r4 + REG_SIZE * 1]
       %endif
         push    r5
         mov     r5, r4
@@ -176,7 +176,7 @@ MY_PROC Sha1_UpdateBlocks_HW, 3
 
         add     rData, 64
         sub     rNum, 1
-        jne     .nextBlock
+        jnz     .nextBlock
 
         REVERSE_STATE
 
