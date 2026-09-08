@@ -242,8 +242,20 @@ endif
 
 endif
 
+ifndef IS_MINGW
+ifdef USE_ASM
+ifdef IS_X86
+ifndef IS_X64
+# link with -no-pie, otherwise we get this warning:
+# ld.bfd: _o/Sha1Opt.o: warning: relocation in read-only section `.text$00'
+# ld.bfd: warning: creating DT_TEXTREL in a PIE
+LFLAGS_NOPIE = -no-pie
+endif
+endif
+endif
+endif
 
-LFLAGS_ALL = $(LFLAGS_STRIP) $(MY_ARCH_2) $(LDFLAGS) $(FLAGS_FLTO) $(LD_arch) $(LFLAGS_NOEXECSTACK) $(OBJS) $(MY_LIBS) $(LIB2)
+LFLAGS_ALL = $(LFLAGS_STRIP) $(MY_ARCH_2) $(LDFLAGS) $(FLAGS_FLTO) $(LD_arch) $(LFLAGS_NOEXECSTACK) $(LFLAGS_NOPIE) $(OBJS) $(MY_LIBS) $(LIB2)
 
 # -s : GCC : Remove all symbol table and relocation information from the executable.
 # -s : CLANG : unsupported
